@@ -1,0 +1,36 @@
+CREATE OR REPLACE FUNCTION selectprofile(
+	br text)
+    RETURNS TABLE(username text, firstname text, lastname text, email text, addr text, state text, country text, phone text) 
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    ROWS 1000
+AS $BODY$ begin
+    return query SELECT * FROM public."profile" where address = $1;
+end; $BODY$;
+
+CREATE OR REPLACE FUNCTION get_user_data( INT )
+RETURNS SETOF RECORD AS $$
+DECLARE
+    v_email RECORD;
+    v_backend RECORD;
+BEGIN
+    SELECT email
+      INTO v_email
+      FROM emails
+     WHERE id = $1;
+
+
+
+    SELECT backend
+      INTO v_backend
+      FROM backends
+     WHERE id = $1;
+
+
+
+    RETURN QUERY SELECT v_email AS email,
+                        v_backend AS backend;
+END;
+$$ LANGUAGE 'plpgsql' SECURITY DEFINER;
